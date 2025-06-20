@@ -1,46 +1,29 @@
-//! By convention, main.zig is where your main function lives in the case that
-//! you are building an executable. If you are making a library, the convention
-//! is to delete this file and start with root.zig instead.
-
-pub fn main() !void {
-    // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-
-    // stdout is for the actual output of your application, for example if you
-    // are implementing gzip, then only the compressed bytes should be sent to
-    // stdout, not any debugging messages.
-    const stdout_file = std.io.getStdOut().writer();
-    var bw = std.io.bufferedWriter(stdout_file);
-    const stdout = bw.writer();
-
-    try stdout.print("Run `zig build test` to run the tests.\n", .{});
-
-    try bw.flush(); // Don't forget to flush!
-}
-
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // Try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
-}
-
-test "use other module" {
-    try std.testing.expectEqual(@as(i32, 150), lib.add(100, 50));
-}
-
-test "fuzz example" {
-    const Context = struct {
-        fn testOne(context: @This(), input: []const u8) anyerror!void {
-            _ = context;
-            // Try passing `--fuzz` to `zig build test` and see if it manages to fail this test case!
-            try std.testing.expect(!std.mem.eql(u8, "canyoufindme", input));
-        }
-    };
-    try std.testing.fuzz(Context{}, Context.testOne, .{});
-}
-
 const std = @import("std");
 
-/// This imports the separate module containing `root.zig`. Take a look in `build.zig` for details.
-const lib = @import("ray_tracing_in_zig_lib");
+pub fn main() !void {
+    const stdout = std.io.getStdOut().writer();
+    // Image
+    const image_width: i32 = 256;
+    const image_height: i32 = 256;
+
+    // Render
+    try stdout.print("P3\n{} {}\n255\n", .{ image_width, image_height });
+
+    var remaining_lines: i32 = image_height;
+    for (0..image_height) |j| {
+        std.debug.print("Scanlines remaining: {}\n", .{remaining_lines});
+        remaining_lines -= 1;
+        for (0..image_width) |i| {
+            const r: f32 = @as(f32, @floatFromInt(i)) / @as(f32, @floatFromInt(image_width - 1));
+            const g: f32 = @as(f32, @floatFromInt(j)) / @as(f32, @floatFromInt(image_height - 1));
+            const b: f32 = 0.0;
+
+            const ir: i32 = @intFromFloat(255.999 * r);
+            const ig: i32 = @intFromFloat(255.999 * g);
+            const ib: i32 = @intFromFloat(255.999 * b);
+
+            // TODO: Write data to a file, instead of the console
+            try stdout.print("{} {} {}\n", .{ ir, ig, ib });
+        }
+    }
+}
