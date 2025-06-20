@@ -1,5 +1,25 @@
-# This is the Zig version of Ray tracing in one Weekend.
+# Ray Tracing in One Weekend (Zig Version)
 
-How to build:  
-In Windows after you used `zig build`, use the following code to pipe the data to a ppm image:  
-`.\ray_tracing_in_zig.exe | set-content image.ppm -encoding String`
+This is the **Zig** version of *Ray Tracing in One Weekend*.
+
+## How to Build
+
+### Windows
+
+- Using redirection operator:
+
+  ```powershell
+  zig build run > image.ppm
+  ```
+
+- If the redirection operator doesn't work due to line ending differences, use:
+
+  ```powershell
+  zig build run | Set-Content image.ppm -Encoding String
+  ```
+
+### Linux / macOS
+
+```bash
+zig build run > image.ppm
+```
