@@ -1,4 +1,6 @@
 const std = @import("std");
+const vec3 = @import("vec3.zig");
+const color = @import("color.zig");
 
 pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
@@ -14,16 +16,13 @@ pub fn main() !void {
         std.debug.print("Scanlines remaining: {}\n", .{remaining_lines});
         remaining_lines -= 1;
         for (0..image_width) |i| {
-            const r: f32 = @as(f32, @floatFromInt(i)) / @as(f32, @floatFromInt(image_width - 1));
-            const g: f32 = @as(f32, @floatFromInt(j)) / @as(f32, @floatFromInt(image_height - 1));
-            const b: f32 = 0.0;
-
-            const ir: i32 = @intFromFloat(255.999 * r);
-            const ig: i32 = @intFromFloat(255.999 * g);
-            const ib: i32 = @intFromFloat(255.999 * b);
-
-            // TODO: Write data to a file, instead of the console
-            try stdout.print("{} {} {}\n", .{ ir, ig, ib });
+            const pixel_color = vec3.init(
+                @as(f32, @floatFromInt(i)) / @as(f32, @floatFromInt(image_width - 1)),
+                @as(f32, @floatFromInt(j)) / @as(f32, @floatFromInt(image_height - 1)),
+                0.0,
+            );
+            // // TODO: Write data to a file, instead of the console
+            try color.write_color(pixel_color);
         }
     }
 }
