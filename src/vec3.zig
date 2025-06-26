@@ -13,31 +13,75 @@ pub fn length(vec: Vec3) f32 {
 }
 
 pub fn add(v: Vec3, w: Vec3) Vec3 {
-    v.x += w.x;
-    v.y += w.y;
-    v.z += w.z;
-    return v;
+    return .{
+        .x = v.x + w.x,
+        .y = v.y + w.y,
+        .z = v.z + w.z,
+    };
+}
+
+pub fn scalarAdd(v: Vec3, t: f32) Vec3 {
+    return .{
+        .x = v.x + t,
+        .y = v.y + t,
+        .z = v.z + t,
+    };
 }
 
 pub fn subs(v: Vec3, w: Vec3) Vec3 {
-    v.x -= w.x;
-    v.y -= w.y;
-    v.z -= w.z;
-    return v;
+    return .{
+        .x = v.x - w.x,
+        .y = v.y - w.y,
+        .z = v.z - w.z,
+    };
+}
+
+pub fn scalarSubs(v: Vec3, t: f32) Vec3 {
+    return .{
+        .x = v.x - t,
+        .y = v.y - t,
+        .z = v.z - t,
+    };
 }
 
 pub fn mul(v: Vec3, w: Vec3) Vec3 {
-    v.x *= w.x;
-    v.y *= w.y;
-    v.z *= w.z;
-    return v;
+    return .{
+        .x = v.x * w.x,
+        .y = v.y * w.y,
+        .z = v.z * w.z,
+    };
+}
+
+pub fn scalarMul(v: Vec3, t: f32) Vec3 {
+    return .{
+        .x = v.x * t,
+        .y = v.y * t,
+        .z = v.z * t,
+    };
+}
+
+pub fn div(v: Vec3, w: Vec3) Vec3 {
+    return .{
+        .x = v.x / w.x,
+        .y = v.y / w.y,
+        .z = v.z / w.z,
+    };
+}
+
+pub fn scalarDiv(v: Vec3, t: f32) Vec3 {
+    return .{
+        .x = v.x / t,
+        .y = v.y / t,
+        .z = v.z / t,
+    };
 }
 
 pub fn scale(v: Vec3, c: f32) Vec3 {
-    v.x *= c;
-    v.y *= c;
-    v.z *= c;
-    return v;
+    return .{
+        .x = v.x * c,
+        .y = v.y * c,
+        .z = v.z * c,
+    };
 }
 
 pub fn dot(v: Vec3, w: Vec3) f32 {
