@@ -1,3 +1,6 @@
+const std = @import("std");
+const assert = std.debug.assert;
+
 x: f32,
 y: f32,
 z: f32,
@@ -18,6 +21,19 @@ pub fn add(v: Vec3, w: Vec3) Vec3 {
         .y = v.y + w.y,
         .z = v.z + w.z,
     };
+}
+
+pub fn sum(xs: anytype) Vec3 {
+    const T = @typeInfo(@TypeOf(xs)).@"struct";
+    comptime assert(T.is_tuple);
+    if (T.fields.len == 0) {
+        return .{ 0, 0, 0 };
+    }
+    var result: Vec3 = xs[0];
+    inline for (1..T.fields.len) |i| {
+        result = add(result, xs[i]);
+    }
+    return result;
 }
 
 pub fn scalarAdd(v: Vec3, t: f32) Vec3 {
