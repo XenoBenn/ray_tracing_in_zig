@@ -5,6 +5,29 @@ const ray = @import("ray.zig");
 
 const ray_color = vec3.init(0, 0, 0);
 
+fn hit_sphere(center: vec3, radius: f32, r: ray) bool {
+    const oc = vec3.subs(center, r.orig);
+    const a = vec3.dot(r.dir, r.dir);
+    const b = -2.0 * vec3.dot(r.dir, oc);
+    const c = vec3.dot(oc, oc) - (radius * radius);
+    const discriminant = (b * b) - (4 * a * c);
+    if (discriminant >= 0) {
+        std.debug.print("I've got a hit!", .{});
+        return true;
+    }
+    return false;
+}
+
+fn rayc(r: ray) vec3 {
+    if (hit_sphere(vec3.init(0, 0, -1), 0.5, r)) {
+        return vec3.init(1, 0, 0);
+    }
+    const unit_direction = r.dir;
+    const a: f32 = 0.5 * (unit_direction.y + 1.0);
+
+    return vec3.add(vec3.scale(vec3.init(1.0, 1.0, 1.0), (1.0 - a)), vec3.scale(vec3.init(0.5, 0.7, 1.0), a));
+}
+
 pub fn main() !void {
     const stdout = std.io.getStdOut().writer();
 
@@ -32,7 +55,11 @@ pub fn main() !void {
     const pixel_delta_v = vec3.scalarDiv(viewport_v, @as(f32, @floatFromInt(image_height)));
 
     // Calculate the location of the upper left pixel
-    const viewport_upper_left = vec3.subs(camera_center, vec3.subs((vec3.init(0, 0, focal_length)), vec3.subs((vec3.scalarDiv(viewport_u, 2)), vec3.scalarDiv(viewport_v, 2))));
+    // const viewport_upper_left = vec3.subs(camera_center, vec3.subs((vec3.init(0, 0, focal_length)), vec3.subs((vec3.scalarDiv(viewport_u, 2)), vec3.scalarDiv(viewport_v, 2))));
+    const viewport_a = vec3.init(0, 0, focal_length);
+    const viewport_b = vec3.scalarDiv(viewport_u, 2);
+    const viewport_c = vec3.scalarDiv(viewport_v, 2);
+    const viewport_upper_left = vec3.subs4(camera_center, viewport_a, viewport_b, viewport_c);
     const pixel00_loc = vec3.add(viewport_upper_left, vec3.scale((vec3.add(pixel_delta_u, pixel_delta_v)), 0.5));
 
     // Render
@@ -43,10 +70,11 @@ pub fn main() !void {
         std.debug.print("Scanlines remaining: {}\n", .{remaining_lines});
         remaining_lines -= 1;
         for (0..image_width) |i| {
-            const pixel_center = vec3.add(pixel00_loc, vec3.add(vec3.scale(pixel_delta_u, @as(f32, @floatFromInt(i))), vec3.scale(pixel_delta_v, @as(f32, @floatFromInt(j)))));
+            const pixel_a = vec3.add(vec3.scale(pixel_delta_u, @as(f32, @floatFromInt(i))), vec3.scale(pixel_delta_v, @as(f32, @floatFromInt(j))));
+            const pixel_center = vec3.add(pixel00_loc, pixel_a);
             const ray_direction = vec3.subs(pixel_center, camera_center);
             const r = ray.init(camera_center, ray_direction);
-            const pixel_color = color.rayc(r);
+            const pixel_color = rayc(r);
 
             // TODO: Write data to a file, instead of the console
             try color.write_color(pixel_color);
